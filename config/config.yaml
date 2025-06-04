@@ -1,0 +1,29 @@
+defaults:
+  - models: models  # 
+  - _self_
+
+hydra:
+  run:
+    dir: ${paths.save_dir} 
+  job:
+    chdir: false 
+    name: train
+
+batch_size: 16
+num_epochs: 200
+learning_rate: 0.0001
+weight_decay: 1e-5
+patience: 8
+num_workers: 2
+test_interval: 3
+
+paths:
+  dataset_path: "./weights/2024pdb.h5"
+  save_dir:  results/${now:%Y-%m-%d}/${models.model_name}_${now:%H-%M-%S}  
+  processed_data: "./weights/process_pdb_0311.pt"
+
+experiment:
+  seed: 42
+  device: "auto"
+  precision: "fp32"
+  n_splits: 5

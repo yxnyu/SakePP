@@ -1,0 +1,3 @@
+[console_scripts]
+sake-predict = sakepp.cli.predict:main
+sake-train = sakepp.cli.train:main

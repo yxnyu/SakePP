@@ -1,0 +1,37 @@
+
+defaults:
+  - _self_
+model_name: "DGNLinearFusion"  
+model_class: "DGNLinearFusion"
+model:
+  # Basic atomic parameters
+  nr_atom_basis: 26
+  nr_edge_basis: 32
+  nr_edge_basis_hidden: 128
+  nr_atom_basis_hidden: 128
+  nr_atom_basis_spatial_hidden: 64
+  nr_atom_basis_spatial: 64
+  nr_atom_basis_velocity: 16
+  
+  # Attention parameters
+  nr_coefficients: 8
+  nr_heads: 5
+  num_layers: 4
+  dropout_rate: 0.15
+  input_size: 26
+  out_size: 256
+  
+  # DGN-specific parameters
+  dgn:
+    hidden_size: 128
+    num_layers: 8
+    node_feat_size: 26
+    edge_feat_size: 17
+  
+  # Physical parameters
+  fusion_temperature: 0.2
+  maximum_interaction_radius: 10.0
+  number_of_radial_basis_functions: 64
+  epsilon: 1e-6
+  scale_factor: 1.0
+  extra_node_features: 0
