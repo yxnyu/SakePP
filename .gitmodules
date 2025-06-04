@@ -7,3 +7,6 @@
 [submodule "package/openff-utilities"]
 	path = package/openff-utilities
 	url = https://github.com/openforcefield/openff-utilities.git
+[submodule "package/modelforge"]
+	path = package/modelforge
+	url = https://github.com/choderalab/modelforge.git
