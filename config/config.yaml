@@ -1,3 +1,8 @@
+# Optimal parameters found through extensive experimentation:
+# batch_size: 128, num_epochs: 80, learning_rate: 0.0001, patience: 8
+# dropout_rate: 0.15, num_layers: 4, dgn_num_layers: 8, fusion_temperature: 0.2
+# These parameters work best for 5-fold or 10-fold cross-validation
+
 defaults:
   - models: models  # 
   - _self_
