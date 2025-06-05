@@ -40,7 +40,7 @@ class CustomDGLDataset(DGLDataset):
                 start, end = f['indices'][i]
                 if end - start < 1:
                     self.logger.warning(
-                        f"跳过第{i}个indice,因为其原子数量小于或等于1。"
+                        f"Skipping index {i} because it has 1 or fewer atoms."
                         )
                     continue
 
@@ -62,7 +62,7 @@ class CustomDGLDataset(DGLDataset):
                 
                 for name, tensor in tensors_to_check.items():
                     if torch.isnan(tensor).any() or torch.isinf(tensor).any():
-                        self.logger.error(f"第 {i} 个 indice 的 {name} 包含 NaN 或 Inf 值。")
+                        self.logger.error(f"Index {i} contains NaN or Inf values in {name}.")
                         continue
                 
                 # Process CA atoms
@@ -83,7 +83,7 @@ class CustomDGLDataset(DGLDataset):
                 
                 # Validate node features
                 if torch.isnan(node_features).any() or torch.isinf(node_features).any():
-                    self.logger.error(f"第 {i} 个 indice 的节点特征包含 NaN 或 Inf 值。")
+                    self.logger.error(f"Index {i} contains NaN or Inf values in node features.")
                     continue
                 # Create edge features
                 
@@ -97,7 +97,7 @@ class CustomDGLDataset(DGLDataset):
 
                 # Validate edge features
                 if torch.isnan(edge_attr).any() or torch.isinf(edge_attr).any():
-                    self.logger.error(f"第 {i} 个 indice 的边特征包含 NaN 或 Inf 值。")
+                    self.logger.error(f"Index {i} contains NaN or Inf values in edge features.")
                     continue
 
                 # Create graph
@@ -111,7 +111,7 @@ class CustomDGLDataset(DGLDataset):
 
                 # Validate graph structure
                 if graph.number_of_nodes() != node_features.size(0):
-                    error_msg = f"节点数量不匹配: {graph.number_of_nodes()} vs {node_features.size(0)}"
+                    error_msg = f"Node count mismatch: {graph.number_of_nodes()} vs {node_features.size(0)}"
                     self.logger.error(error_msg)
                     continue
 
