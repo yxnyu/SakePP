@@ -1,5 +1,8 @@
 import numpy as np
 import torch
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def angle_to_3d(phi, psi):
@@ -12,43 +15,55 @@ def angle_to_3d(phi, psi):
     return np.stack([x, y, z], axis=-1)
 
 
-def create_edge_index_and_features(coordinates, residue_types, chain_ids, cutoff=10.0, k=30):
-    """Create edge index and features"""
-    # Calculate distance matrix
-    distances = torch.cdist(coordinates, coordinates)
+def create_edge_index_and_features(ca_coordinates, ca_residue_types, ca_chain_ids, cutoff=10.0, k=30, device='cpu'):
+    """Create edge index and features for cross-chain interactions with RBF encoding"""
+    num_residues = ca_coordinates.size(0)
+    distances = torch.cdist(ca_coordinates, ca_coordinates)
 
-    # Create adjacency matrix
-    adj_matrix = (distances < cutoff)
+    if torch.isnan(distances).any() or torch.isinf(distances).any():
+        logger.error("NaN or Inf values found in distance matrix calculation.")
+        return None, None
+    
+    src_list = []
+    dst_list = []
+    edge_features = []
+    
+    for i in range(num_residues):
+        current_chain_id = ca_chain_ids[i].item()
+        mask = (ca_chain_ids != current_chain_id) & (distances[i] <= cutoff)
+        valid_indices = torch.nonzero(mask, as_tuple=True)[0]
 
-    # Find k nearest neighbors for each node
-    k = min(k, adj_matrix.size(0) - 1)
-    _, topk_indices = torch.topk(distances, k=k+1, dim=1, largest=False)
-    topk_indices = topk_indices[:, 1:]  # Remove self-connection
+        if valid_indices.size(0) > 0:
+            sorted_indices = valid_indices[torch.argsort(distances[i, valid_indices])][:k]
+            for j in sorted_indices:
+                src_list.append(i)
+                dst_list.append(j)
 
-    # Create edge index
-    rows = torch.arange(adj_matrix.size(0)).unsqueeze(1).expand(-1, k)
-    edge_index = torch.stack([rows.flatten(), topk_indices.flatten()])
+                d = distances[i, j]
+                edge_attr_temp = [d]
 
-    # Calculate edge features
-    src_coords = coordinates[edge_index[0]]
-    dst_coords = coordinates[edge_index[1]]
-    edge_vectors = dst_coords - src_coords
-    edge_lengths = torch.norm(edge_vectors, dim=1, keepdim=True)
-    edge_directions = edge_vectors / (edge_lengths + 1e-6)
+                # Use RBF function to calculate RBF encoding
+                D_count = 16
+                D_min = 0.
+                D_max = cutoff
+                D_mu = torch.linspace(D_min, D_max, D_count, device=device)
+                D_mu = D_mu.view([1, -1])
+                D_sigma = (D_max - D_min) / D_count
+                D_expand = d.unsqueeze(-1)
+                RBF = torch.exp(-((D_expand - D_mu) / D_sigma) ** 2)
+                edge_attr_temp.extend(RBF.squeeze().tolist())
 
-    # Residue type features
-    src_res_types = residue_types[edge_index[0]]
-    dst_res_types = residue_types[edge_index[1]]
+                edge_features.append(edge_attr_temp)
 
-    # Chain ID features
-    same_chain = (chain_ids[edge_index[0]] == chain_ids[edge_index[1]]).float().unsqueeze(1)
-    # Combine all edge features
-    edge_features = torch.cat([
-        edge_lengths,          # 1D: distance
-        edge_directions,       # 3D: direction vector
-        src_res_types,        # 1D: source node residue type
-        dst_res_types,        # 1D: destination node residue type
-        same_chain,           # 1D: whether same chain
-    ], dim=1)
+    edge_index = torch.tensor([src_list, dst_list], dtype=torch.long)
+    edge_attr = torch.tensor(edge_features, dtype=torch.float)
 
-    return edge_index, edge_features
+    if torch.isnan(edge_index).any() or torch.isinf(edge_index).any():
+        logger.error("NaN or Inf values found when creating edge indices.")
+        return None, None
+
+    if torch.isnan(edge_attr).any() or torch.isinf(edge_attr).any():
+        logger.error("NaN or Inf values found when creating edge features.")
+        return None, None
+
+    return edge_index, edge_attr

@@ -5,11 +5,6 @@ import torch.nn.functional as F
 
 class MultiplySigmoid(nn.Module):
     """Multiplicative Sigmoid activation function
-
-        该模块实现了一种乘性Sigmoid激活函数,主要包含以下组件:
-        1. 乘性因子: 控制Sigmoid的缩放
-        2. Sigmoid激活函数: 将输入值缩放到[0,1]区间
-        3. 乘法操作: 将Sigmoid输出与一个预定义的乘性因子相乘
     """
     def __init__(self, factor: float = 2.0):
         super().__init__()

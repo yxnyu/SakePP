@@ -14,7 +14,7 @@ class CustomDGLDataset(DGLDataset):
     def __init__(
             self, 
             filename, 
-            save_path='/weights/process_pdb_0311.pt'
+            save_path='/scratch/yx2892/GNN/sing_egnn/process/process_decoy_100.pt'
             ):
         self.filename = filename
         self._save_path = save_path
@@ -36,12 +36,9 @@ class CustomDGLDataset(DGLDataset):
             num_indices = len(f['indices'])
             
             for i in range(num_indices):
-                # try:
                 start, end = f['indices'][i]
                 if end - start < 1:
-                    self.logger.warning(
-                        f"跳过第{i}个indice,因为其原子数量小于或等于1。"
-                        )
+                    print(f"Skipping index {i} because it has 1 or fewer atoms.")
                     continue
 
                 # Load data
@@ -53,17 +50,21 @@ class CustomDGLDataset(DGLDataset):
                 psi_angles = torch.tensor(f['psi_angles'][start:end], dtype=torch.float)
 
                 # Data validation
-                tensors_to_check = {
-                    'coordinates': coordinates,
-                    'residue_types': residue_types,
-                    'phi_angles': phi_angles,
-                    'psi_angles': psi_angles
-                }
-                
-                for name, tensor in tensors_to_check.items():
-                    if torch.isnan(tensor).any() or torch.isinf(tensor).any():
-                        self.logger.error(f"第 {i} 个 indice 的 {name} 包含 NaN 或 Inf 值。")
-                        continue
+                if torch.isnan(coordinates).any() or torch.isinf(coordinates).any():
+                    self.logger.error(f"Index {i} contains NaN or Inf values in coordinates.")
+                    continue
+    
+                if torch.isnan(residue_types).any() or torch.isinf(residue_types).any():
+                    self.logger.error(f"Index {i} contains NaN or Inf values in residue types.")
+                    continue
+    
+                if torch.isnan(phi_angles).any() or torch.isinf(phi_angles).any():
+                    self.logger.error(f"Index {i} contains NaN or Inf values in phi angles.")
+                    continue
+    
+                if torch.isnan(psi_angles).any() or torch.isinf(psi_angles).any():
+                    self.logger.error(f"Index {i} contains NaN or Inf values in psi angles.")
+                    continue
                 
                 # Process CA atoms
                 ca_mask = ca_flags == 1
@@ -83,7 +84,7 @@ class CustomDGLDataset(DGLDataset):
                 
                 # Validate node features
                 if torch.isnan(node_features).any() or torch.isinf(node_features).any():
-                    self.logger.error(f"第 {i} 个 indice 的节点特征包含 NaN 或 Inf 值。")
+                    self.logger.error(f"Index {i} contains NaN or Inf values in node features.")
                     continue
                 # Create edge features
                 
@@ -97,31 +98,31 @@ class CustomDGLDataset(DGLDataset):
 
                 # Validate edge features
                 if torch.isnan(edge_attr).any() or torch.isinf(edge_attr).any():
-                    self.logger.error(f"第 {i} 个 indice 的边特征包含 NaN 或 Inf 值。")
+                    self.logger.error(f"Index {i} contains NaN or Inf values in edge features.")
                     continue
 
                 # Create graph
                 num_nodes = ca_coordinates.size(0)
-                graph = dgl.graph((edge_index[0], edge_index[1]), num_nodes=num_nodes)
+                graph = dgl.graph(([], []), num_nodes=num_nodes)
 
-                # Add graph features
+                graph.add_edges(edge_index[0], edge_index[1])
                 graph.edata['attr'] = edge_attr
                 graph.ndata['feat'] = node_features
                 graph.ndata['coord'] = ca_coordinates
 
                 # Validate graph structure
                 if graph.number_of_nodes() != node_features.size(0):
-                    error_msg = f"节点数量不匹配: {graph.number_of_nodes()} vs {node_features.size(0)}"
-                    self.logger.error(error_msg)
-                    continue
+                    print(f"Problem found when processing index {i}: node count mismatch with feature count.")
+                    print(f"Expected node count: {node_features.size(0)}, actual node count: {graph.number_of_nodes()}")
+                    raise ValueError("Node count mismatch with feature count: {} vs {}".format(graph.number_of_nodes(), node_features.size(0)))
 
                 # Add label
-                label = torch.tensor(f['labels'][i], dtype=torch.float).view(1)
+                label = torch.tensor(f['labels'][i], dtype=torch.float)
 
                 # Save graph and label
                 self.graphs.append((graph, label))
 
-            self.logger.info(f"Data processing completed. Processed {len(self.graphs)} valid samples.")
+            self.logger.info("Data processing and saving completed.")
             torch.save((self.graphs, self.labels), self._save_path)
 
     def load_processed_data(self):
