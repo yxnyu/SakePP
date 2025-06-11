@@ -55,7 +55,7 @@ Then, run the main script:
 python main.py
 ```
 To customise your training settings, i.e. dataset or pretrained weight, or using a different path importing your dataset,
-please edit ``` ./config/config.yaml```, and put your files in the correct directory conrrespondingly.
+please edit ``` ./config/config.yaml```, and put your files in the correct directory correspondingly.
 
 To customise the model, i.e.  hyper-parameters of model,
 please edit ``` ./config/models/models.yaml```.
