@@ -12,7 +12,7 @@ SAKE-PP: Spatial Attention Kinetic GNN for Protein–Protein Interactions
 The model combines Laplacian eigenvector-based orientation, physics-inspired attention, and geometric message passing to capture both local and 
 global features of protein interfaces. It supports training and evaluation workflows with batch I/O using `.pt` tensors.
 
-
+We are currently migrating the code from the HPC environment and may encounter some minor bugs along the way. We plan to have completed most of the testing and system integration in one week
 
 
 ## Quick Start
@@ -49,6 +49,8 @@ SakePP/
 ```
 You can download these files from Google Drive: 
 (https://drive.google.com/drive/folders/1SemY9YfQb-4r21VLN9_uMEFWAJfcl0Fh)
+
+And in the github, we also provide a trainning using in the antibody-antigen test checkpoint.
 
 Then, run the main script:
 ```bash
