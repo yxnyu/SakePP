@@ -44,11 +44,11 @@ at the very first please make sure ``` .h5```dataset and ``` .pt```checkpoint al
 ```
 SakePP/
   |- weights/
-    |- 2024pdb.h5
-    |- process_pdb_0311.pt
+    |- PPI_pdbbin_irmsd.h5
+    |- processed_pdb.pt
 ```
 You can download these files from Google Drive: 
-[2024pdb.h5](https://drive.google.com/file/d/xxxxxx.h5)  [process_pdb_0311.pt](https://drive.google.com/file/d/xxxxxx.pt) 
+(https://drive.google.com/drive/folders/1SemY9YfQb-4r21VLN9_uMEFWAJfcl0Fh)
 
 Then, run the main script:
 ```bash
