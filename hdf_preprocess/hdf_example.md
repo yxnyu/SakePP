@@ -52,14 +52,14 @@ python hdf.py --paths-file '/scratch/yx2892/Hbond/ZDock/control/2024pdb/pdb_path
 ```bash
 python hdf.py --paths-file pdb_paths.txt \
               --labels-file labels.txt \
-              --output dataset.h5
+              --output ./dataset.h5
 ```
 
 ### Test mode (process single sample):
 ```bash
 python hdf.py --paths-file pdb_paths.txt \
               --labels-file labels.txt \
-              --output test.h5 \
+              --output ./test.h5 \
               --max-samples 1 \
               --verbose
 ```
@@ -68,7 +68,7 @@ python hdf.py --paths-file pdb_paths.txt \
 ```bash
 python hdf.py --paths-file large_dataset_paths.txt \
               --labels-file large_dataset_labels.txt \
-              --output large_dataset.h5 \
+              --output ./large_dataset.h5 \
               --max-samples 50000 \
               --cutoff 12.0 \
               --min-residues 10 \
