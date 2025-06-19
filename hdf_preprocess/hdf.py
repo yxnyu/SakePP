@@ -260,7 +260,6 @@ def read_pdb_interface_atoms_ca_distance(
 
     missing_atom_count = 0
     valid_residue_count = 0
-    processed_residues = set()
 
     for ca_a, ca_b in set(ca_pairs):
         residue_a = ca_a.get_parent()
@@ -268,11 +267,6 @@ def read_pdb_interface_atoms_ca_distance(
 
         # Process residues from both chains
         for residue in [residue_a, residue_b]:
-            residue_key = (residue.get_full_id()[2], residue.get_full_id()[3])
-            if residue_key in processed_residues:
-                continue
-            processed_residues.add(residue_key)
-            
             chain_id = chain_id_map[residue.get_parent().id]
             valid_residue_count += 1
             
