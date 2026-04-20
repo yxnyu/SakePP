@@ -1,9 +1,10 @@
-SAKE-PP: Spatial Attention Kinetic GNN for Protein–Protein Interactions
+SAKE-PP: Spatial Attention Kinetic GNN for Protein–Protein Interactions (JACS Au, 2026)
 ==============================================
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.3+-EE4C2C.svg)](https://pytorch.org/)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/yxnyu/SakePP/pulls/)
 
 
 ## Overview
@@ -83,11 +84,11 @@ developing the following features to enhance usability and scalability:
 If you use SAKE-PP in your research or development, please cite:
 
 ```bibtex
-@article{sakepp2024,
-  title={Quantifying Protein-Protein Interaction with a Spatial Attention Kinetic Graph Neural Network},
+@article{sakepp2026Xu,
+  title={SAKE-PP: A Spatial-Attention Equivariant Network for Accurate Ranking of Protein–Protein Interaction Models},
   author={Yuzhi Xu et al.},
-  journal={},
-  year={2025}
+  journal={JACS Au},
+  year={2026}
 }
 ```
 
